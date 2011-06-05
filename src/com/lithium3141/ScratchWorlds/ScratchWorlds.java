@@ -1,13 +1,17 @@
 package com.lithium3141.ScratchWorlds;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.config.Configuration;
 
 public class ScratchWorlds extends JavaPlugin {
 	
@@ -15,14 +19,34 @@ public class ScratchWorlds extends JavaPlugin {
 	public static final String LOG_PREFIX = "[ScratchWorlds]";
 	
 	public static final String COMMAND_NAME = "scratch";
+	
+	public static final String CONFIG_FILE_NAME = "ScratchWorlds.yml";
+	public static final String CONFIG_WORLD_LIST_KEY = "worlds";
+	
+	public Configuration swConfig;
+	public List<String> scratchWorldNames = new ArrayList<String>();
 
 	@Override
 	public void onDisable() {
+		// Save config
+		this.swConfig.setProperty(CONFIG_WORLD_LIST_KEY, this.scratchWorldNames);
+		if(!this.swConfig.save()) {
+			LOG.warning(LOG_PREFIX + " - Couldn't save configuration file! Continuing anyway...");
+		}
+		
 		LOG.info(LOG_PREFIX + " - Version " + this.getDescription().getVersion() + " disabled");
 	}
 
 	@Override
 	public void onEnable() {
+		// Set up configuration file
+		this.getDataFolder().mkdirs();
+		
+		// Read configuration file
+		this.swConfig = new Configuration(new File(this.getDataFolder(), CONFIG_FILE_NAME));
+		this.swConfig.load();
+		this.scratchWorldNames = swConfig.getStringList("worlds", new ArrayList<String>());
+		
 		LOG.info(LOG_PREFIX + " - Version " + this.getDescription().getVersion() + " enabled");
 	}
 	
