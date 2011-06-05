@@ -2,7 +2,6 @@ package com.lithium3141.ScratchWorlds;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -66,27 +65,33 @@ public class ScratchWorlds extends JavaPlugin {
 			}
 			
 			try {
-				Class<?> klass = Class.forName("com.lithium3141.ScratchWorlds.SWCommands");
-				for(Method m : klass.getMethods()) {
-					if(m.getName().equalsIgnoreCase(subcommand)) {
-						m.invoke(new SWCommands(this), sender, subargs);
-						return true;
-					}
-				}
-				LOG.warning("Unknown /" + COMMAND_NAME + " subcommand: " + subcommand);
+				// Reflection magic: find the class for the invoked command, instantiate it, and call its execute() method
+				Class<?> klass = Class.forName("com.lithium3141.ScratchWorlds.commands.SW" + this.capitalize(subcommand) + "Command");
+				SWCommand commandInstance = (SWCommand)klass.getConstructor(Class.forName("com.lithium3141.ScratchWorlds.ScratchWorlds")).newInstance(this);
+				commandInstance.execute(sender, subargs);
 			} catch (ClassNotFoundException e) {
-				LOG.severe(LOG_PREFIX + " - Could not find command implementations! Is your plugin JAR corrupted?");
+				LOG.warning("Unknown /" + COMMAND_NAME + " subcommand: " + subcommand);
 			} catch (IllegalArgumentException e) {
 				LOG.severe(LOG_PREFIX + " - Error passing arguments to command invocation! Is your plugin JAR corrupted?");
 			} catch (IllegalAccessException e) {
 				LOG.severe(LOG_PREFIX + " - Access error invoking command! Is your plugin JAR corrupted?");
 			} catch (InvocationTargetException e) {
 				LOG.severe(LOG_PREFIX + " - Target error invoking command! Is your plugin JAR corrupted?");
+			} catch (SecurityException e) {
+				LOG.severe(LOG_PREFIX + " - Security error invoking command! Is your plugin JAR corrupted?");
+			} catch (InstantiationException e) {
+				LOG.severe(LOG_PREFIX + " - Instantiation error invoking command! Is your plugin JAR corrupted?");
+			} catch (NoSuchMethodException e) {
+				LOG.severe(LOG_PREFIX + " - Method location error invoking command! Is your plugin JAR corrupted?");
 			}
 			return true;
 		}
 		
 		return false;
+	}
+	
+	private String capitalize(String arg) {
+		return arg.substring(0, 1).toUpperCase() + arg.substring(1).toLowerCase();
 	}
 
 }
