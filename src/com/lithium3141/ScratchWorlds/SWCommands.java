@@ -1,5 +1,7 @@
 package com.lithium3141.ScratchWorlds;
 
+import java.io.File;
+import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -123,11 +125,12 @@ public class SWCommands {
 		if(!this.checkArgLength(sender, args, 0)) return;
 		
 		// Notify
-		ScratchWorlds.LOG.info("Regenerating scratch worlds...");
+		ScratchWorlds.LOG.info(ScratchWorlds.LOG_PREFIX + " - Regenerating scratch worlds...");
 		
 		// Remove all players from each scratch world
 		for(Player player : this.plugin.getServer().getOnlinePlayers()) {
 			if(this.plugin.scratchWorldNames.contains(player.getWorld().getName())) {
+				ScratchWorlds.LOG.fine(ScratchWorlds.LOG_PREFIX + " - Kicking player " + player.getName() + " from world " + player.getWorld().getName());
 				player.kickPlayer("Regenerating scratch world: " + player.getWorld().getName());
 			}
 		}
@@ -136,12 +139,37 @@ public class SWCommands {
 		for(World world : this.plugin.getServer().getWorlds()) {
 			if(this.plugin.scratchWorldNames.contains(world.getName())) {
 				for(Chunk c : world.getLoadedChunks()) {
-					if(c.getX() != 0 || c.getZ() != 0) {
-						ScratchWorlds.LOG.fine(ScratchWorlds.LOG_PREFIX + " - Unloading chunk (" + c.getX() + "," + c.getZ() + ")");
-						world.unloadChunk(c.getX(), c.getZ());
+					ScratchWorlds.LOG.fine(ScratchWorlds.LOG_PREFIX + " - Unloading chunk (" + c.getX() + "," + c.getZ() + ")");
+					world.unloadChunk(c.getX(), c.getZ());
+					world.regenerateChunk(c.getX(), c.getZ());
+				}
+				
+				// Locate world folder. Assumes world exists in CB root
+				File worldFolder = new File(world.getName());
+				if(!worldFolder.exists() || !worldFolder.isDirectory() || !worldFolder.canRead()) {
+					sender.sendMessage(ChatColor.RED + "World folder does not exist or is not readable");
+				}
+				
+				// Find subdirs - should be {data, players, region}
+				File[] subdirectories = worldFolder.listFiles(new FileFilter() {
+					@Override
+					public boolean accept(File arg0) {
+						return arg0.isDirectory();
+					}
+				});
+				
+				// Empty each subdir
+				for(File subdirectory : subdirectories) {
+					ScratchWorlds.LOG.fine(ScratchWorlds.LOG_PREFIX + " - Emptying folder " + subdirectory.getName() + " for world " + world.getName());
+					File[] subdirFiles = subdirectory.listFiles();
+					for(File subdirFile : subdirFiles) {
+						subdirFile.delete();
 					}
 				}
 			}
 		}
+		
+		// Notify
+		ScratchWorlds.LOG.info(ScratchWorlds.LOG_PREFIX + " - Done!");
 	}
 }
