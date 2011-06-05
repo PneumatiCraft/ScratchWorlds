@@ -9,21 +9,32 @@ import java.util.logging.Logger;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
 
+import com.nijikokun.bukkit.Permissions.Permissions;
+import com.nijiko.permissions.PermissionHandler;
+
 public class ScratchWorlds extends JavaPlugin {
 	
+	// Logging items
 	public static final Logger LOG = Logger.getLogger("Minecraft");
 	public static final String LOG_PREFIX = "[ScratchWorlds]";
 	
+	// Command name
 	public static final String COMMAND_NAME = "scratch";
 	
+	// Config info
 	public static final String CONFIG_FILE_NAME = "ScratchWorlds.yml";
 	public static final String CONFIG_WORLD_LIST_KEY = "worlds";
 	
+	// Active config variables
 	public Configuration swConfig;
 	public List<String> scratchWorldNames = new ArrayList<String>();
+	
+	// Permissions interface
+	public PermissionHandler permissionHandler;
 
 	@Override
 	public void onDisable() {
@@ -38,6 +49,9 @@ public class ScratchWorlds extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
+		// Initialize Permissions system
+		setupPermissions();
+		
 		// Set up configuration file
 		this.getDataFolder().mkdirs();
 		
@@ -48,6 +62,19 @@ public class ScratchWorlds extends JavaPlugin {
 		
 		LOG.info(LOG_PREFIX + " - Version " + this.getDescription().getVersion() + " enabled");
 	}
+	
+	private void setupPermissions() {
+	      Plugin permissionsPlugin = this.getServer().getPluginManager().getPlugin("Permissions");
+
+	      if(this.permissionHandler == null) {
+	          if(permissionsPlugin != null) {
+	              this.permissionHandler = ((Permissions) permissionsPlugin).getHandler();
+	              LOG.info(LOG_PREFIX + " - Hooked into Permissions version " + permissionsPlugin.getDescription().getVersion());
+	          } else {
+	              LOG.info(LOG_PREFIX + " - Permission system not detected, defaulting to OP");
+	          }
+	      }
+	  }
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
