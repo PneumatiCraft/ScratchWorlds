@@ -6,6 +6,7 @@ import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 public class SWCommands {
 	private ScratchWorlds plugin;
@@ -87,5 +88,21 @@ public class SWCommands {
 		
 		this.plugin.scratchWorldNames.remove(worldName);
 		sender.sendMessage("World " + worldName + " is no longer a scratch world.");
+	}
+	
+	public void regenerate(CommandSender sender, String[] args) {
+		if(!this.checkArgLength(sender, args, 0)) return;
+		
+		// Notify
+		ScratchWorlds.LOG.info("Regenerating scratch worlds...");
+		
+		// Remove all players from each scratch world
+		for(Player player : this.plugin.getServer().getOnlinePlayers()) {
+			if(this.plugin.scratchWorldNames.contains(player.getWorld().getName())) {
+				player.kickPlayer("Regenerating scratch world: " + player.getWorld().getName());
+			}
+		}
+		
+		// TODO continue
 	}
 }
