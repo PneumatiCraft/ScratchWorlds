@@ -1,7 +1,11 @@
 craftbukkit-0.0.1-SNAPSHOT.jar
+ScratchWorlds.jar
 
 # Eclipse
 bin
 .classpath
 .project
 .settings
+
+# Mac
+.DS_Store
