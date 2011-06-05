@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -23,6 +24,13 @@ public class SWCommands {
 		return true;
 	}
 	
+	/**
+	 * List all worlds currently existing, separating by scratch and
+	 * non-scratch worlds.
+	 * 
+	 * @param sender The sender of the list command
+	 * @param args Any arguments to the list command. Expected to be empty
+	 */
 	public void list(CommandSender sender, String[] args) {
 		if(!this.checkArgLength(sender, args, 0)) return;
 		
@@ -58,6 +66,12 @@ public class SWCommands {
 		return true;
 	}
 	
+	/**
+	 * 
+	 * @param sender The sender of the mark command
+	 * @param args Any arguments to the mark command. Expected to contain
+	 *             only the name of the world to mark
+	 */
 	public void mark(CommandSender sender, String[] args) {
 		if(!this.checkArgLength(sender, args, 1)) return;
 		
@@ -74,6 +88,13 @@ public class SWCommands {
 		sender.sendMessage("World " + worldName + " is now a scratch world.");
 	}
 	
+	/**
+	 * Mark a particular world as a non-scratch (i.e. permanent) world.
+	 * 
+	 * @param sender The sender of the unmark command
+	 * @param args Any arguments to the unmark command. Expected to contain
+	 *             only the name of the world to unmark
+	 */
 	public void unmark(CommandSender sender, String[] args) {
 		if(!this.checkArgLength(sender, args, 1)) return;
 		
@@ -90,6 +111,14 @@ public class SWCommands {
 		sender.sendMessage("World " + worldName + " is no longer a scratch world.");
 	}
 	
+	/**
+	 * Forcibly kick all players in a scratch world; remove all chunks outside
+	 * the (0,0) chunk in each scratch world; and regenerate all unloaded chunks
+	 * in scratch worlds.
+	 * 
+	 * @param sender The sender of the regenerate command
+	 * @param args Any arguments to the regenerate command. Expected to be emtpy
+	 */
 	public void regenerate(CommandSender sender, String[] args) {
 		if(!this.checkArgLength(sender, args, 0)) return;
 		
@@ -103,6 +132,16 @@ public class SWCommands {
 			}
 		}
 		
-		// TODO continue
+		// Unload all chunks except spawn
+		for(World world : this.plugin.getServer().getWorlds()) {
+			if(this.plugin.scratchWorldNames.contains(world.getName())) {
+				for(Chunk c : world.getLoadedChunks()) {
+					if(c.getX() != 0 || c.getZ() != 0) {
+						ScratchWorlds.LOG.fine(ScratchWorlds.LOG_PREFIX + " - Unloading chunk (" + c.getX() + "," + c.getZ() + ")");
+						world.unloadChunk(c.getX(), c.getZ());
+					}
+				}
+			}
+		}
 	}
 }
