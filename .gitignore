@@ -1,6 +1,9 @@
 craftbukkit-0.0.1-SNAPSHOT.jar
 ScratchWorlds.jar
 
+# Minecraft testing
+minecraft
+
 # Eclipse
 bin
 .classpath
