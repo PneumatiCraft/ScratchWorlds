@@ -3,10 +3,14 @@ package com.lithium3141.ScratchWorlds;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Timer;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -37,6 +41,10 @@ public class ScratchWorlds extends JavaPlugin {
 	// Permissions interface
 	public PermissionHandler permissionHandler;
 	public static final String PERMISSION_ROOT_NAME = "ScratchWorlds";
+	
+	// Scheduling info
+	public static final long REGEN_INTERVAL = 15000L; // 15 seconds - TODO pick a more sane value
+	public Map<World, Timer> timers = new HashMap<World, Timer>();
 
 	@Override
 	public void onDisable() {
@@ -61,6 +69,22 @@ public class ScratchWorlds extends JavaPlugin {
 		this.swConfig = new Configuration(new File(this.getDataFolder(), CONFIG_FILE_NAME));
 		this.swConfig.load();
 		this.scratchWorldNames = swConfig.getStringList("worlds", new ArrayList<String>());
+		
+		// Set up timers
+		for(String worldName : this.scratchWorldNames) {
+			World world = this.getServer().getWorld(worldName);
+			if(world != null) {
+				Timer timer = new Timer();
+				timer.schedule(new SWScheduleTask(world, null), REGEN_INTERVAL, REGEN_INTERVAL);
+				this.timers.put(world, timer);
+			} else {
+				// No world with given name; remove from list
+				this.scratchWorldNames.remove(worldName);
+			}
+		}
+		for(World w : this.timers.keySet()) {
+			LOG.info(LOG_PREFIX + " - Scheduled timer for world " + w.getName() + " with interval " + REGEN_INTERVAL);
+		}
 		
 		LOG.info(LOG_PREFIX + " - Version " + this.getDescription().getVersion() + " enabled");
 	}
