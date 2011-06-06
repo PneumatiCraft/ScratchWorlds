@@ -8,18 +8,16 @@ import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
-public class SWRegenerateThread extends Thread {
+public class SWRegenerateWorker {
 	private World world;
 	private CommandSender sender;
 	
-	public SWRegenerateThread(World world, CommandSender sender) {
-		super();
-		
+	public SWRegenerateWorker(World world, CommandSender sender) {
 		this.world = world;
 		this.sender = sender;
 	}
 	
-	public void run() {
+	public void execute() {
 		for(Chunk c : this.world.getLoadedChunks()) {
 			ScratchWorlds.LOG.fine(ScratchWorlds.LOG_PREFIX + " - Unloading chunk (" + c.getX() + "," + c.getZ() + ")");
 			this.world.unloadChunk(c.getX(), c.getZ());

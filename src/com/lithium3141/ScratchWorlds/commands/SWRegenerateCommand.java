@@ -5,7 +5,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.lithium3141.ScratchWorlds.SWCommand;
-import com.lithium3141.ScratchWorlds.SWRegenerateThread;
+import com.lithium3141.ScratchWorlds.SWRegenerateWorker;
 import com.lithium3141.ScratchWorlds.ScratchWorlds;
 
 /**
@@ -34,10 +34,10 @@ public class SWRegenerateCommand extends SWCommand {
 			}
 		}
 		
-		// Unload all chunks except spawn
+		// Dispatch regenerate command
 		for(World world : this.plugin.getServer().getWorlds()) {
 			if(this.plugin.scratchWorldNames.contains(world.getName())) {
-				(new SWRegenerateThread(world, sender)).start();
+				(new SWRegenerateWorker(world, sender)).execute();
 			}
 		}
 		

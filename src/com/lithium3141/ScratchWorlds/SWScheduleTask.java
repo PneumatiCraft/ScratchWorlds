@@ -19,7 +19,7 @@ public class SWScheduleTask extends TimerTask {
 
 	@Override
 	public void run() {
-		(new SWRegenerateThread(this.world, this.sender)).start();
+		(new SWRegenerateWorker(this.world, this.sender)).execute();
 	}
 
 }
