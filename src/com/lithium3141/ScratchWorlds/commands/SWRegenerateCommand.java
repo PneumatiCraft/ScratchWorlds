@@ -2,17 +2,9 @@ package com.lithium3141.ScratchWorlds.commands;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.Map;
 import java.util.Random;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
-import net.minecraft.server.WorldData;
 import net.minecraft.server.WorldServer;
 
 import org.bukkit.ChatColor;
@@ -21,11 +13,6 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.entity.Player;
-import org.jnbt.CompoundTag;
-import org.jnbt.LongTag;
-import org.jnbt.NBTInputStream;
-import org.jnbt.NBTOutputStream;
-import org.jnbt.Tag;
 
 import com.lithium3141.ScratchWorlds.SWCommand;
 import com.lithium3141.ScratchWorlds.ScratchWorlds;
@@ -151,51 +138,6 @@ public class SWRegenerateCommand extends SWCommand {
 			sender.sendMessage(ChatColor.YELLOW + "Could not cast World object");
 			return false;
 		}
-		
-		/*
-		NBTInputStream nbtin = null;
-		try {
-			// Get file for reading
-			File levelDatFile = new File(world.getName(), "level.dat");
-			if(!levelDatFile.exists() || !levelDatFile.canRead()) {
-				sender.sendMessage(ChatColor.RED + "Cannot locate level.dat file for reading; aborting..."); return false;
-			}
-			nbtin = new NBTInputStream(new GZIPInputStream(new FileInputStream(levelDatFile)));
-			
-			// Parse tags
-			Tag rootTag = nbtin.readTag();
-			if(!rootTag.getName().equals("Data")) {
-				sender.sendMessage(ChatColor.RED + "Root NBT tag has unexpected name; is your plugin up to date?"); return false;
-			}
-			CompoundTag dataTag = (CompoundTag)rootTag;
-			Map<String,Tag> childTags = dataTag.getValue();
-			LongTag seedTag = (LongTag)childTags.get("RandomSeed");
-			
-			// Verify seed and generate new
-			if(seedTag == null || seedTag.getValue() != world.getSeed()) {
-				sender.sendMessage(ChatColor.YELLOW + "Seed from NBT (" + seedTag.getValue() + ") differs from CB seed (" + world.getSeed() + "); ignoring...");
-			}
-			long seed = (new Random()).nextLong();
-			ScratchWorlds.LOG.fine(ScratchWorlds.LOG_PREFIX + " - Modifying world seed; new seed is " + seed);
-			
-			// Update seed in tag tree
-			childTags.put("RandomSeed", new LongTag("RandomSeed", seed));
-			dataTag = new CompoundTag("Data", childTags);
-			
-			// Write tag tree back to level.dat
-			NBTOutputStream nbtout = new NBTOutputStream(new GZIPOutputStream(new FileOutputStream(levelDatFile)));
-			nbtout.writeTag(dataTag);
-			nbtout.close();
-			nbtin.close();
-		} catch (FileNotFoundException e) {
-			sender.sendMessage(ChatColor.RED + "level.dat file does not exist or is not readable");
-			return false;
-		} catch (IOException e) {
-			e.printStackTrace();
-			sender.sendMessage(ChatColor.RED + "I/O error altering level.dat");
-			return false;
-		}
-		*/
 		
 		return true;
 	}
