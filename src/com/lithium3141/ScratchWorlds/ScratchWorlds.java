@@ -1,17 +1,10 @@
 package com.lithium3141.ScratchWorlds;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
@@ -22,8 +15,8 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
 
-import com.nijikokun.bukkit.Permissions.Permissions;
 import com.nijiko.permissions.PermissionHandler;
+import com.nijikokun.bukkit.Permissions.Permissions;
 
 public class ScratchWorlds extends JavaPlugin {
 	
@@ -69,6 +62,8 @@ public class ScratchWorlds extends JavaPlugin {
 		this.swConfig = new Configuration(new File(this.getDataFolder(), CONFIG_FILE_NAME));
 		this.swConfig.load();
 		this.scratchWorldNames = swConfig.getStringList("worlds", new ArrayList<String>());
+		
+		LOG.setLevel(Level.FINE); // TODO debugging - remove
 		
 		LOG.info(LOG_PREFIX + " - Version " + this.getDescription().getVersion() + " enabled");
 	}
