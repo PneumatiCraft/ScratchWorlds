@@ -2,6 +2,7 @@
 craftbukkit-0.0.1-SNAPSHOT.jar
 ScratchWorlds.jar
 Permissions.jar
+jnbt.jar
 
 # Minecraft testing
 minecraft
@@ -14,3 +15,6 @@ bin
 
 # Mac
 .DS_Store
+
+# JNBT
+src/org

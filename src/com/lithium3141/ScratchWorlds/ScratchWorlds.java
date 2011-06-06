@@ -1,9 +1,17 @@
 package com.lithium3141.ScratchWorlds;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
@@ -52,10 +60,15 @@ public class ScratchWorlds extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		// Initialize Permissions system
-		setupPermissions();
+		this.setupPermissions();
 		
-		// Set up configuration file
+		// Set up configuration folder
 		this.getDataFolder().mkdirs();
+		
+		// Load the JNBT JAR
+		if(!this.loadJNBT()) {
+			LOG.severe(LOG_PREFIX + " - Dependency JNBT couldn't be loaded! Ensure jnbt.jar is available.");
+		}
 		
 		// Read configuration file
 		this.swConfig = new Configuration(new File(this.getDataFolder(), CONFIG_FILE_NAME));
@@ -63,6 +76,55 @@ public class ScratchWorlds extends JavaPlugin {
 		this.scratchWorldNames = swConfig.getStringList("worlds", new ArrayList<String>());
 		
 		LOG.info(LOG_PREFIX + " - Version " + this.getDescription().getVersion() + " enabled");
+	}
+	
+	private boolean loadJNBT() {
+		File jnbtJar = new File(this.getDataFolder(), "jnbt.jar");
+		
+		// Ensure JAR available
+		if(!jnbtJar.exists() || !jnbtJar.canRead()) {
+			LOG.warning(LOG_PREFIX + " - Couldn't find jnbt.jar; extracting...");
+			
+			// Extract jnbt.jar
+			try {
+				// Read plugin JAR
+				JarFile pluginJar = new JarFile(this.getFile());
+				JarEntry jnbtEntry = pluginJar.getJarEntry("jnbt.jar");
+				if(jnbtEntry == null) {
+					LOG.severe(LOG_PREFIX + " - Couldn't locate jnbt.jar in JAR file; aborting...");
+					return false;
+				}
+				
+				// Copy JNBT JAR from plugin to data dir
+				InputStream jnbtInStream = pluginJar.getInputStream(jnbtEntry);
+				FileOutputStream jnbtOutStream = new FileOutputStream(jnbtJar);
+				LOG.fine(LOG_PREFIX + " - Writing jnbt.jar from archived copy...");
+				int b;
+				while((b = jnbtInStream.read()) != -1) {
+					jnbtOutStream.write((byte)b);
+				}
+			} catch (IOException e) {
+				LOG.severe(LOG_PREFIX + " - Couldn't read plugin JAR for extraction; aborting...");
+				return false;
+			}
+		}
+		
+		// Load JAR
+		try {
+			URL jnbtURL = jnbtJar.toURI().toURL();
+			ClassLoader cl = new URLClassLoader(new URL[]{jnbtURL});
+			cl.loadClass("org.jnbt.Tag");
+		} catch (MalformedURLException e) {
+			LOG.severe(LOG_PREFIX + " - Couldn't construct URL for jnbt.jar; aborting...");
+			return false;
+		} catch (ClassNotFoundException e) {
+			LOG.severe(LOG_PREFIX + " - Couldn't load class from jnbt.jar; aborting...");
+			return false;
+		}
+		
+		
+		LOG.info(LOG_PREFIX + " - Located and loaded jnbt.jar");
+		return true;
 	}
 	
 	private void setupPermissions() {
@@ -73,7 +135,7 @@ public class ScratchWorlds extends JavaPlugin {
 	              this.permissionHandler = ((Permissions) permissionsPlugin).getHandler();
 	              LOG.info(LOG_PREFIX + " - Hooked into Permissions version " + permissionsPlugin.getDescription().getVersion());
 	          } else {
-	              LOG.info(LOG_PREFIX + " - Permission system not detected, defaulting to OP");
+	              LOG.info(LOG_PREFIX + " - Permissions system not detected; allowing all commands");
 	          }
 	      }
 	  }
