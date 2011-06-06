@@ -65,66 +65,12 @@ public class ScratchWorlds extends JavaPlugin {
 		// Set up configuration folder
 		this.getDataFolder().mkdirs();
 		
-		// Load the JNBT JAR
-		if(!this.loadJNBT()) {
-			LOG.severe(LOG_PREFIX + " - Dependency JNBT couldn't be loaded! Ensure jnbt.jar is available.");
-		}
-		
 		// Read configuration file
 		this.swConfig = new Configuration(new File(this.getDataFolder(), CONFIG_FILE_NAME));
 		this.swConfig.load();
 		this.scratchWorldNames = swConfig.getStringList("worlds", new ArrayList<String>());
 		
 		LOG.info(LOG_PREFIX + " - Version " + this.getDescription().getVersion() + " enabled");
-	}
-	
-	private boolean loadJNBT() {
-		File jnbtJar = new File(this.getDataFolder(), "jnbt.jar");
-		
-		// Ensure JAR available
-		if(!jnbtJar.exists() || !jnbtJar.canRead()) {
-			LOG.warning(LOG_PREFIX + " - Couldn't find jnbt.jar; extracting...");
-			
-			// Extract jnbt.jar
-			try {
-				// Read plugin JAR
-				JarFile pluginJar = new JarFile(this.getFile());
-				JarEntry jnbtEntry = pluginJar.getJarEntry("jnbt.jar");
-				if(jnbtEntry == null) {
-					LOG.severe(LOG_PREFIX + " - Couldn't locate jnbt.jar in JAR file; aborting...");
-					return false;
-				}
-				
-				// Copy JNBT JAR from plugin to data dir
-				InputStream jnbtInStream = pluginJar.getInputStream(jnbtEntry);
-				FileOutputStream jnbtOutStream = new FileOutputStream(jnbtJar);
-				LOG.fine(LOG_PREFIX + " - Writing jnbt.jar from archived copy...");
-				int b;
-				while((b = jnbtInStream.read()) != -1) {
-					jnbtOutStream.write((byte)b);
-				}
-			} catch (IOException e) {
-				LOG.severe(LOG_PREFIX + " - Couldn't read plugin JAR for extraction; aborting...");
-				return false;
-			}
-		}
-		
-		// Load JAR
-		try {
-			URL jnbtURL = jnbtJar.toURI().toURL();
-			ClassLoader cl = new URLClassLoader(new URL[]{jnbtURL});
-			cl.loadClass("org.jnbt.Tag");
-		} catch (MalformedURLException e) {
-			LOG.severe(LOG_PREFIX + " - Couldn't construct URL for jnbt.jar; aborting...");
-			return false;
-		} catch (ClassNotFoundException e) {
-			LOG.severe(LOG_PREFIX + " - Couldn't load class from jnbt.jar; aborting...");
-			return false;
-		}
-		
-		
-		LOG.info(LOG_PREFIX + " - Located and loaded jnbt.jar");
-		return true;
 	}
 	
 	private void setupPermissions() {
