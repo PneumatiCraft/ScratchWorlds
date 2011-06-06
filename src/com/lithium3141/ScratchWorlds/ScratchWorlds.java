@@ -22,7 +22,7 @@ public class ScratchWorlds extends JavaPlugin {
 	
 	// Logging items
 	public static final Logger LOG = Logger.getLogger("Minecraft");
-	public static final String LOG_PREFIX = "[ScratchWorlds]";
+	public static final String LOG_PREFIX = "[ScratchWorlds] ";
 	
 	// Command name
 	public static final String COMMAND_NAME = "scratch";
@@ -44,10 +44,10 @@ public class ScratchWorlds extends JavaPlugin {
 		// Save config
 		this.swConfig.setProperty(CONFIG_WORLD_LIST_KEY, this.scratchWorldNames);
 		if(!this.swConfig.save()) {
-			LOG.warning(LOG_PREFIX + " - Couldn't save configuration file! Continuing anyway...");
+			LOG.warning(LOG_PREFIX + "Couldn't save configuration file! Continuing anyway...");
 		}
 		
-		LOG.info(LOG_PREFIX + " - Version " + this.getDescription().getVersion() + " disabled");
+		LOG.info(LOG_PREFIX + "Version " + this.getDescription().getVersion() + " disabled");
 	}
 
 	@Override
@@ -63,9 +63,7 @@ public class ScratchWorlds extends JavaPlugin {
 		this.swConfig.load();
 		this.scratchWorldNames = swConfig.getStringList("worlds", new ArrayList<String>());
 		
-		LOG.setLevel(Level.FINE); // TODO debugging - remove
-		
-		LOG.info(LOG_PREFIX + " - Version " + this.getDescription().getVersion() + " enabled");
+		LOG.info(LOG_PREFIX + "Version " + this.getDescription().getVersion() + " enabled");
 	}
 	
 	private void setupPermissions() {
@@ -74,9 +72,9 @@ public class ScratchWorlds extends JavaPlugin {
 	      if(this.permissionHandler == null) {
 	          if(permissionsPlugin != null) {
 	              this.permissionHandler = ((Permissions) permissionsPlugin).getHandler();
-	              LOG.info(LOG_PREFIX + " - Hooked into Permissions version " + permissionsPlugin.getDescription().getVersion());
+	              LOG.info(LOG_PREFIX + "Hooked into Permissions version " + permissionsPlugin.getDescription().getVersion());
 	          } else {
-	              LOG.info(LOG_PREFIX + " - Permissions system not detected; allowing all commands");
+	              LOG.info(LOG_PREFIX + "Permissions system not detected; allowing all commands");
 	          }
 	      }
 	  }
@@ -111,17 +109,17 @@ public class ScratchWorlds extends JavaPlugin {
 			} catch (ClassNotFoundException e) {
 				LOG.warning("Unknown /" + COMMAND_NAME + " subcommand: " + subcommand);
 			} catch (IllegalArgumentException e) {
-				LOG.severe(LOG_PREFIX + " - Error passing arguments to command invocation! Is your plugin JAR corrupted?");
+				LOG.severe(LOG_PREFIX + "Error passing arguments to command invocation! Is your plugin JAR corrupted?");
 			} catch (IllegalAccessException e) {
-				LOG.severe(LOG_PREFIX + " - Access error invoking command! Is your plugin JAR corrupted?");
+				LOG.severe(LOG_PREFIX + "Access error invoking command! Is your plugin JAR corrupted?");
 			} catch (InvocationTargetException e) {
-				LOG.severe(LOG_PREFIX + " - Target error invoking command! Is your plugin JAR corrupted?");
+				LOG.severe(LOG_PREFIX + "Target error invoking command! Is your plugin JAR corrupted?");
 			} catch (SecurityException e) {
-				LOG.severe(LOG_PREFIX + " - Security error invoking command! Is your plugin JAR corrupted?");
+				LOG.severe(LOG_PREFIX + "Security error invoking command! Is your plugin JAR corrupted?");
 			} catch (InstantiationException e) {
-				LOG.severe(LOG_PREFIX + " - Instantiation error invoking command! Is your plugin JAR corrupted?");
+				LOG.severe(LOG_PREFIX + "Instantiation error invoking command! Is your plugin JAR corrupted?");
 			} catch (NoSuchMethodException e) {
-				LOG.severe(LOG_PREFIX + " - Method location error invoking command! Is your plugin JAR corrupted?");
+				LOG.severe(LOG_PREFIX + "Method location error invoking command! Is your plugin JAR corrupted?");
 			}
 			return true;
 		}

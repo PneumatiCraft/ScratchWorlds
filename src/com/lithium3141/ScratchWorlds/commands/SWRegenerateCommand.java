@@ -33,7 +33,7 @@ public class SWRegenerateCommand extends SWCommand {
 		if(!this.checkArgLength(sender, args, 0)) return;
 		
 		// Notify
-		ScratchWorlds.LOG.info(ScratchWorlds.LOG_PREFIX + " - Regenerating scratch worlds...");
+		ScratchWorlds.LOG.info(ScratchWorlds.LOG_PREFIX + "Regenerating scratch worlds...");
 		if(sender instanceof Player) {
 			sender.sendMessage("Regenerating scratch worlds...");
 		}
@@ -41,7 +41,7 @@ public class SWRegenerateCommand extends SWCommand {
 		// Remove all players from each scratch world
 		for(Player player : this.plugin.getServer().getOnlinePlayers()) {
 			if(this.plugin.scratchWorldNames.contains(player.getWorld().getName())) {
-				ScratchWorlds.LOG.fine(ScratchWorlds.LOG_PREFIX + " - Kicking player " + player.getName() + " from world " + player.getWorld().getName());
+				ScratchWorlds.LOG.fine(ScratchWorlds.LOG_PREFIX + "Kicking player " + player.getName() + " from world " + player.getWorld().getName());
 				player.kickPlayer("Regenerating scratch world: " + player.getWorld().getName());
 			}
 		}
@@ -49,8 +49,8 @@ public class SWRegenerateCommand extends SWCommand {
 		// Unload all chunks except spawn
 		for(World world : this.plugin.getServer().getWorlds()) {
 			if(this.plugin.scratchWorldNames.contains(world.getName())) {
-				if(!this.redoChunks(world, sender)) {
-					sender.sendMessage(ChatColor.RED + "Failed to redo chunks for world " + world.getName());
+				if(!this.unloadChunks(world, sender)) {
+					sender.sendMessage(ChatColor.RED + "Failed to unload chunks for world " + world.getName());
 				}
 				
 				if(!this.emptyWorldFolder(world, sender)) {
@@ -59,20 +59,23 @@ public class SWRegenerateCommand extends SWCommand {
 				
 				if(!this.alterSeed(world, sender)) {
 					sender.sendMessage(ChatColor.YELLOW + "Failed to modify level data file; " + world.getName() + " seed unchanged");
+				} else {
+					// Unload chunks again to force seed change
+					this.unloadChunks(world, sender);
 				}
 			}
 		}
 		
 		// Notify
-		ScratchWorlds.LOG.info(ScratchWorlds.LOG_PREFIX + " - Done!");
+		ScratchWorlds.LOG.info(ScratchWorlds.LOG_PREFIX + "Done!");
 		if(sender instanceof Player) {
 			sender.sendMessage("Done regenerating");
 		}
 	}
 	
-	private boolean redoChunks(World world, CommandSender sender) {
+	private boolean unloadChunks(World world, CommandSender sender) {
 		for(Chunk c : world.getLoadedChunks()) {
-			ScratchWorlds.LOG.fine(ScratchWorlds.LOG_PREFIX + " - Unloading chunk (" + c.getX() + "," + c.getZ() + ")");
+			ScratchWorlds.LOG.fine(ScratchWorlds.LOG_PREFIX + "Unloading chunk (" + c.getX() + "," + c.getZ() + ")");
 			world.unloadChunk(c.getX(), c.getZ());
 			world.regenerateChunk(c.getX(), c.getZ());
 		}
@@ -96,7 +99,7 @@ public class SWRegenerateCommand extends SWCommand {
 		
 		// Empty each subdir
 		for(File subdirectory : subdirectories) {
-			ScratchWorlds.LOG.fine(ScratchWorlds.LOG_PREFIX + " - Emptying folder " + subdirectory.getName() + " for world " + world.getName());
+			ScratchWorlds.LOG.fine(ScratchWorlds.LOG_PREFIX + "Emptying folder " + subdirectory.getName() + " for world " + world.getName());
 			File[] subdirFiles = subdirectory.listFiles();
 			for(File subdirFile : subdirFiles) {
 				subdirFile.delete();
