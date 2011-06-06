@@ -49,19 +49,16 @@ public class SWRegenerateCommand extends SWCommand {
 		// Unload all chunks except spawn
 		for(World world : this.plugin.getServer().getWorlds()) {
 			if(this.plugin.scratchWorldNames.contains(world.getName())) {
+				if(!this.alterSeed(world, sender)) {
+					sender.sendMessage(ChatColor.YELLOW + "Failed to modify level data file; " + world.getName() + " seed unchanged");
+				}
+				
 				if(!this.unloadChunks(world, sender)) {
 					sender.sendMessage(ChatColor.RED + "Failed to unload chunks for world " + world.getName());
 				}
 				
 				if(!this.emptyWorldFolder(world, sender)) {
 					sender.sendMessage(ChatColor.RED + "Failed to empty folder for world " + world.getName());
-				}
-				
-				if(!this.alterSeed(world, sender)) {
-					sender.sendMessage(ChatColor.YELLOW + "Failed to modify level data file; " + world.getName() + " seed unchanged");
-				} else {
-					// Unload chunks again to force seed change
-					this.unloadChunks(world, sender);
 				}
 			}
 		}
