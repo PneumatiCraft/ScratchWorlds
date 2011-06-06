@@ -1,6 +1,9 @@
 package com.lithium3141.ScratchWorlds.commands;
 
+import java.util.Timer;
+
 import org.bukkit.ChatColor;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
 import com.lithium3141.ScratchWorlds.SWCommand;
@@ -29,6 +32,13 @@ public class SWUnmarkCommand extends SWCommand {
 		}
 		
 		this.plugin.scratchWorldNames.remove(worldName);
+		
+		World world = this.plugin.getServer().getWorld(worldName);
+		Timer timer = this.plugin.timers.remove(world);
+		if(timer != null) {
+			timer.cancel();
+		}
+		
 		sender.sendMessage("World " + worldName + " is no longer a scratch world.");
 	}
 
