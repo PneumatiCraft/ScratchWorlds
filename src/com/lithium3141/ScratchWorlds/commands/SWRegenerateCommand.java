@@ -125,7 +125,6 @@ public class SWRegenerateCommand extends SWCommand {
 				return false;
 			} catch (NoSuchFieldException e) {
 				sender.sendMessage(ChatColor.YELLOW + "Could not find seed field; is your plugin up to date?");
-				e.printStackTrace();
 				return false;
 			} catch (IllegalArgumentException e) {
 				sender.sendMessage(ChatColor.YELLOW + "Illegal argument finding seed field; is your plugin up to date?");
