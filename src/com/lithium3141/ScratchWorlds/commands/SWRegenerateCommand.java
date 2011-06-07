@@ -1,17 +1,21 @@
 package com.lithium3141.ScratchWorlds.commands;
 
 import java.io.File;
-import java.io.FileFilter;
-import java.lang.reflect.Field;
-import java.util.Random;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+//import java.lang.reflect.Field;
+//import java.util.Random;
 
-import net.minecraft.server.WorldServer;
+//import net.minecraft.server.WorldServer;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.World;
+import org.bukkit.World.Environment;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.CraftWorld;
+//import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.entity.Player;
 
 import com.lithium3141.ScratchWorlds.SWCommand;
@@ -49,16 +53,14 @@ public class SWRegenerateCommand extends SWCommand {
 		// Unload all chunks except spawn
 		for(World world : this.plugin.getServer().getWorlds()) {
 			if(this.plugin.scratchWorldNames.contains(world.getName())) {
-				if(!this.alterSeed(world, sender)) {
-					sender.sendMessage(ChatColor.YELLOW + "Failed to modify level data file; " + world.getName() + " seed unchanged");
-				}
+				String worldName = world.getName();
 				
 				if(!this.unloadChunks(world, sender)) {
-					sender.sendMessage(ChatColor.RED + "Failed to unload chunks for world " + world.getName());
+					sender.sendMessage(ChatColor.RED + "Failed to unload chunks for world " + worldName);
 				}
 				
-				if(!this.emptyWorldFolder(world, sender)) {
-					sender.sendMessage(ChatColor.RED + "Failed to empty folder for world " + world.getName());
+				if(!this.recreateWorld(world, sender)) {
+					sender.sendMessage(ChatColor.RED + "Failed to recreate world " + worldName);
 				}
 			}
 		}
@@ -70,6 +72,55 @@ public class SWRegenerateCommand extends SWCommand {
 		}
 	}
 	
+	private boolean recreateWorld(World world, CommandSender sender) {
+		String worldName = world.getName();
+		Environment env = world.getEnvironment();
+		
+		// Locate world folder. Assumes world exists in CB root
+		File worldFolder = new File(world.getName());
+		if(!worldFolder.exists() || !worldFolder.isDirectory() || !worldFolder.canRead()) {
+			sender.sendMessage(ChatColor.RED + "World folder does not exist or is not readable"); return false;
+		}
+		
+		// Save session.lock file
+		File sessionLockFile = new File(world.getName(), "session.lock");
+		if(!sessionLockFile.exists() || sessionLockFile.isDirectory() || !sessionLockFile.canRead()) {
+			sender.sendMessage(ChatColor.RED + "Session lock file does not exist or is not readable"); return false;
+		}
+		long lockSize = sessionLockFile.length();
+		byte[] lockContents = new byte[(int)lockSize];
+		try {
+			FileInputStream inStream = new FileInputStream(sessionLockFile);
+			inStream.read(lockContents);
+			inStream.close();
+		} catch (FileNotFoundException e) {
+			sender.sendMessage(ChatColor.RED + "Session lock file mysteriously disappeared"); return false;
+		} catch (IOException e) {
+			sender.sendMessage(ChatColor.RED + "Error reading session lock file"); return false;
+		}
+		
+		// Delete world folder
+		if(!this.recursiveDelete(worldFolder)) {
+			sender.sendMessage(ChatColor.RED + "Failed to delete world folder"); return false;
+		}
+		
+		// Regenerate world
+		this.plugin.getServer().createWorld(worldName, env);
+		
+		// Rewrite session lock file
+		try {
+			FileOutputStream outStream = new FileOutputStream(sessionLockFile);
+			outStream.write(lockContents);
+			outStream.close();
+		} catch (FileNotFoundException e) {
+			sender.sendMessage(ChatColor.RED + "Session lock file can't be found for writing"); return false;
+		} catch (IOException e) {
+			sender.sendMessage(ChatColor.RED + "Couldn't rewrite session lock file"); return false;
+		}
+		
+		return (this.plugin.getServer().getWorld(worldName) != null);
+	}
+
 	private boolean unloadChunks(World world, CommandSender sender) {
 		for(Chunk c : world.getLoadedChunks()) {
 			ScratchWorlds.LOG.fine(ScratchWorlds.LOG_PREFIX + "Unloading chunk (" + c.getX() + "," + c.getZ() + ")");
@@ -79,33 +130,18 @@ public class SWRegenerateCommand extends SWCommand {
 		return true;
 	}
 	
-	private boolean emptyWorldFolder(World world, CommandSender sender) {
-		// Locate world folder. Assumes world exists in CB root
-		File worldFolder = new File(world.getName());
-		if(!worldFolder.exists() || !worldFolder.isDirectory() || !worldFolder.canRead()) {
-			sender.sendMessage(ChatColor.RED + "World folder does not exist or is not readable"); return false;
-		}
-		
-		// Find subdirs - should be {data, players, region}
-		File[] subdirectories = worldFolder.listFiles(new FileFilter() {
-			@Override
-			public boolean accept(File arg0) {
-				return arg0.isDirectory();
+	private boolean recursiveDelete(File file) {
+		if(file.isDirectory()) {
+			for(File f : file.listFiles()) {
+				this.recursiveDelete(f);
 			}
-		});
-		
-		// Empty each subdir
-		for(File subdirectory : subdirectories) {
-			ScratchWorlds.LOG.fine(ScratchWorlds.LOG_PREFIX + "Emptying folder " + subdirectory.getName() + " for world " + world.getName());
-			File[] subdirFiles = subdirectory.listFiles();
-			for(File subdirFile : subdirFiles) {
-				subdirFile.delete();
-			}
+		} else {
+			file.delete();
 		}
-		
 		return true;
 	}
 	
+	/*
 	private boolean alterSeed(World world, CommandSender sender) {
 		if(world instanceof CraftWorld) {
 			CraftWorld craftWorld = (CraftWorld)world;
@@ -140,5 +176,6 @@ public class SWRegenerateCommand extends SWCommand {
 		
 		return true;
 	}
+	*/
 
 }
