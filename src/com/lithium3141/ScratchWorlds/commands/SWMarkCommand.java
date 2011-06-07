@@ -1,13 +1,11 @@
 package com.lithium3141.ScratchWorlds.commands;
 
-import java.util.Timer;
-
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
 import com.lithium3141.ScratchWorlds.SWCommand;
-import com.lithium3141.ScratchWorlds.SWScheduleTask;
+import com.lithium3141.ScratchWorlds.SWRegenerateWorker;
 import com.lithium3141.ScratchWorlds.ScratchWorlds;
 
 /**
@@ -34,10 +32,8 @@ public class SWMarkCommand extends SWCommand {
 		
 		this.plugin.scratchWorldNames.add(worldName);
 		
-		Timer timer = new Timer();
 		World world = this.plugin.getServer().getWorld(worldName);
-		timer.schedule(new SWScheduleTask(world, sender), ScratchWorlds.REGEN_INTERVAL, ScratchWorlds.REGEN_INTERVAL);
-		this.plugin.timers.put(world, timer);
+		this.plugin.getServer().getScheduler().scheduleAsyncRepeatingTask(this.plugin, new SWRegenerateWorker(world, null), ScratchWorlds.REGEN_INTERVAL, ScratchWorlds.REGEN_INTERVAL);
 		
 		sender.sendMessage("World " + worldName + " is now a scratch world.");
 	}

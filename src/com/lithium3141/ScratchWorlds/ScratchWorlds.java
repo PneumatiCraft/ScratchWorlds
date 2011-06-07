@@ -74,9 +74,7 @@ public class ScratchWorlds extends JavaPlugin {
 		for(String worldName : this.scratchWorldNames) {
 			World world = this.getServer().getWorld(worldName);
 			if(world != null) {
-				Timer timer = new Timer();
-				timer.schedule(new SWScheduleTask(world, null), REGEN_INTERVAL, REGEN_INTERVAL);
-				this.timers.put(world, timer);
+				this.getServer().getScheduler().scheduleAsyncRepeatingTask(this, new SWRegenerateWorker(world, null), REGEN_INTERVAL, REGEN_INTERVAL);
 			} else {
 				// No world with given name; remove from list
 				this.scratchWorldNames.remove(worldName);

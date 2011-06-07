@@ -8,7 +8,7 @@ import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
-public class SWRegenerateWorker {
+public class SWRegenerateWorker implements Runnable {
 	private World world;
 	private CommandSender sender;
 	
@@ -17,7 +17,9 @@ public class SWRegenerateWorker {
 		this.sender = sender;
 	}
 	
-	public void execute() {
+	public void run() {
+		ScratchWorlds.LOG.info(ScratchWorlds.LOG_PREFIX + " - Regenerating world " + this.world.getName());
+		
 		for(Chunk c : this.world.getLoadedChunks()) {
 			ScratchWorlds.LOG.fine(ScratchWorlds.LOG_PREFIX + " - Unloading chunk (" + c.getX() + "," + c.getZ() + ")");
 			this.world.unloadChunk(c.getX(), c.getZ());

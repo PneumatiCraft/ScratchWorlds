@@ -37,7 +37,7 @@ public class SWRegenerateCommand extends SWCommand {
 		// Dispatch regenerate command
 		for(World world : this.plugin.getServer().getWorlds()) {
 			if(this.plugin.scratchWorldNames.contains(world.getName())) {
-				(new SWRegenerateWorker(world, sender)).execute();
+				this.plugin.getServer().getScheduler().scheduleAsyncDelayedTask(this.plugin, new SWRegenerateWorker(world, null));
 			}
 		}
 		
