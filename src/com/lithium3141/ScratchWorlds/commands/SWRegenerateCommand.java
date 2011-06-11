@@ -1,21 +1,13 @@
 package com.lithium3141.ScratchWorlds.commands;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-//import java.lang.reflect.Field;
-//import java.util.Random;
-
-//import net.minecraft.server.WorldServer;
+import java.io.FilenameFilter;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.command.CommandSender;
-//import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.entity.Player;
 
 import com.lithium3141.ScratchWorlds.SWCommand;
@@ -89,41 +81,22 @@ public class SWRegenerateCommand extends SWCommand {
 			sender.sendMessage(ChatColor.RED + "World folder does not exist or is not readable"); return false;
 		}
 		
-		// Save session.lock file
-		File sessionLockFile = new File(world.getName(), "session.lock");
-		if(!sessionLockFile.exists() || sessionLockFile.isDirectory() || !sessionLockFile.canRead()) {
-			sender.sendMessage(ChatColor.RED + "Session lock file does not exist or is not readable"); return false;
-		}
-		long lockSize = sessionLockFile.length();
-		byte[] lockContents = new byte[(int)lockSize];
-		try {
-			FileInputStream inStream = new FileInputStream(sessionLockFile);
-			inStream.read(lockContents);
-			inStream.close();
-		} catch (FileNotFoundException e) {
-			sender.sendMessage(ChatColor.RED + "Session lock file mysteriously disappeared"); return false;
-		} catch (IOException e) {
-			sender.sendMessage(ChatColor.RED + "Error reading session lock file"); return false;
-		}
-		
 		// Delete world folder
-		if(!this.recursiveDelete(worldFolder)) {
-			sender.sendMessage(ChatColor.RED + "Failed to delete world folder"); return false;
+		for(File file : worldFolder.listFiles(new FilenameFilter() {
+
+			@Override
+			public boolean accept(File arg0, String arg1) {
+				return (!arg1.equals("session.lock") && !arg1.equals("players"));
+			}
+			
+		})) {
+			if(!this.recursiveDelete(file)) {
+				sender.sendMessage(ChatColor.RED + "Failed to delete world file: " + file.toString()); return false;
+			}
 		}
 		
 		// Regenerate world
 		this.plugin.getServer().createWorld(worldName, env);
-		
-		// Rewrite session lock file
-		try {
-			FileOutputStream outStream = new FileOutputStream(sessionLockFile);
-			outStream.write(lockContents);
-			outStream.close();
-		} catch (FileNotFoundException e) {
-			sender.sendMessage(ChatColor.RED + "Session lock file can't be found for writing"); return false;
-		} catch (IOException e) {
-			sender.sendMessage(ChatColor.RED + "Couldn't rewrite session lock file"); return false;
-		}
 		
 		return (this.plugin.getServer().getWorld(worldName) != null);
 	}
