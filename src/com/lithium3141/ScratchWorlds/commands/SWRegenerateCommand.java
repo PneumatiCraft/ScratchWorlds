@@ -120,42 +120,5 @@ public class SWRegenerateCommand extends SWCommand {
 		}
 		return true;
 	}
-	
-	/*
-	private boolean alterSeed(World world, CommandSender sender) {
-		if(world instanceof CraftWorld) {
-			CraftWorld craftWorld = (CraftWorld)world;
-			Class<?> craftWorldClass = craftWorld.getClass();
-			try {
-				Field worldField = craftWorldClass.getDeclaredField("world");
-				worldField.setAccessible(true);
-				WorldServer worldServer = (WorldServer) worldField.get(craftWorld);
-				
-				Field aField = worldServer.worldData.getClass().getDeclaredField("a");
-				aField.setAccessible(true);
-				long newSeed = (new Random()).nextLong();
-				aField.setLong(worldServer.worldData, newSeed);
-				ScratchWorlds.LOG.fine(ScratchWorlds.LOG_PREFIX + "Set seed for world " + world.getName() + " to " + newSeed);
-			} catch (SecurityException e) {
-				sender.sendMessage(ChatColor.YELLOW + "Security exception accessing seed field");
-				return false;
-			} catch (NoSuchFieldException e) {
-				sender.sendMessage(ChatColor.YELLOW + "Could not find seed field; is your plugin up to date?");
-				return false;
-			} catch (IllegalArgumentException e) {
-				sender.sendMessage(ChatColor.YELLOW + "Illegal argument finding seed field; is your plugin up to date?");
-				return false;
-			} catch (IllegalAccessException e) {
-				sender.sendMessage(ChatColor.YELLOW + "Access exception finding seed field; is your plugin up to date?");
-				return false;
-			}
-		} else {
-			sender.sendMessage(ChatColor.YELLOW + "Could not cast World object");
-			return false;
-		}
-		
-		return true;
-	}
-	*/
 
 }
