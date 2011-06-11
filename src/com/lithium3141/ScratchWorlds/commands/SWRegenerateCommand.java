@@ -76,6 +76,13 @@ public class SWRegenerateCommand extends SWCommand {
 		String worldName = world.getName();
 		Environment env = world.getEnvironment();
 		
+		for(Chunk c : world.getLoadedChunks()) {
+			world.unloadChunk(c.getX(), c.getZ());
+		}
+		if(!this.plugin.getServer().unloadWorld(worldName, false)) {
+			sender.sendMessage(ChatColor.RED + "Couldn't unload world being regenerated"); return false;
+		}
+		
 		// Locate world folder. Assumes world exists in CB root
 		File worldFolder = new File(world.getName());
 		if(!worldFolder.exists() || !worldFolder.isDirectory() || !worldFolder.canRead()) {
