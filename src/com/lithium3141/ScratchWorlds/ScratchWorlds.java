@@ -132,7 +132,12 @@ public class ScratchWorlds extends JavaPlugin {
 	
 	boolean checkPermission(CommandSender sender, String permission) {
 		if(sender instanceof Player) {
-			return (this.permissionHandler != null && this.permissionHandler.has((Player)sender, permission)); 
+			if(this.permissionHandler == null) {
+				// No permissions; allow
+				return true;
+			} else {
+				return this.permissionHandler.has((Player)sender, permission);
+			}
 		} else {
 			// Running from console; always allow
 			return true;
