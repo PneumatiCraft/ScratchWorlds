@@ -27,6 +27,7 @@ public class ScratchWorlds extends JavaPlugin {
 	public static final String COMMAND_NAME = "scratch";
 	
 	// Config info
+	public static final int LATEST_CONFIG_VERSION = 2;
 	public static final String CONFIG_FILE_NAME = "ScratchWorlds.yml";
 	public static final String CONFIG_WORLD_LIST_KEY = "worlds";
 	
