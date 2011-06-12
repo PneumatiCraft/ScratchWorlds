@@ -1,7 +1,7 @@
 name: ScratchWorlds
 main: com.lithium3141.ScratchWorlds.ScratchWorlds
 author: lithium3141
-version: 0.3
+version: 0.4
 database: false
 commands:
     scratch:
