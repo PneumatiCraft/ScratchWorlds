@@ -3,7 +3,9 @@ package com.lithium3141.ScratchWorlds;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
@@ -12,7 +14,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.util.config.Configuration;
 
 import com.nijiko.permissions.PermissionHandler;
 import com.nijikokun.bukkit.Permissions.Permissions;
@@ -26,14 +27,10 @@ public class ScratchWorlds extends JavaPlugin {
 	// Command name
 	public static final String COMMAND_NAME = "scratch";
 	
-	// Config info
-	public static final int LATEST_CONFIG_VERSION = 2;
-	public static final String CONFIG_FILE_NAME = "ScratchWorlds.yml";
-	public static final String CONFIG_WORLD_LIST_KEY = "worlds";
-	
 	// Active config variables
-	public Configuration swConfig;
+	public SWConfiguration swConfig;
 	public List<String> scratchWorldNames = new ArrayList<String>();
+	protected Map<String, SWWorld> worlds = new HashMap<String, SWWorld>();
 	
 	// Permissions interface
 	public PermissionHandler permissionHandler;
@@ -41,13 +38,17 @@ public class ScratchWorlds extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		// Save config
-		this.swConfig.setProperty(CONFIG_WORLD_LIST_KEY, this.scratchWorldNames);
-		if(!this.swConfig.save()) {
-			LOG.warning(LOG_PREFIX + "Couldn't save configuration file! Continuing anyway...");
-		}
+		// Save configuration
+		this.writeConfig();
 		
 		LOG.info(LOG_PREFIX + "Version " + this.getDescription().getVersion() + " disabled");
+	}
+	
+	private void writeConfig() {
+		// Save config
+		if(!this.swConfig.write(this)) {
+			LOG.warning(LOG_PREFIX + "Failed to save configuration file (version " + this.swConfig.getVersion() + "); continuing anyway...");
+		}
 	}
 
 	@Override
@@ -55,15 +56,27 @@ public class ScratchWorlds extends JavaPlugin {
 		// Initialize Permissions system
 		this.setupPermissions();
 		
+		// Get a configuration
+		this.readConfig();
+		
+		LOG.info(LOG_PREFIX + "Version " + this.getDescription().getVersion() + " enabled");
+	}
+	
+	private void readConfig() {
 		// Set up configuration folder
 		this.getDataFolder().mkdirs();
 		
 		// Read configuration file
-		this.swConfig = new Configuration(new File(this.getDataFolder(), CONFIG_FILE_NAME));
-		this.swConfig.load();
-		this.scratchWorldNames = swConfig.getStringList("worlds", new ArrayList<String>());
-		
-		LOG.info(LOG_PREFIX + "Version " + this.getDescription().getVersion() + " enabled");
+		this.swConfig = SWConfiguration.detectConfiguration(new File(this.getDataFolder(), SWConfiguration.CONFIG_FILE_NAME));
+		while(this.swConfig.getVersion() != SWConfiguration.LATEST_CONFIG_VERSION) {
+			SWConfiguration upgraded = this.swConfig.upgrade();
+			if(upgraded == null) {
+				LOG.warning(LOG_PREFIX + "Unable to upgrade configuration from version " + this.swConfig.getVersion() + ".");
+				LOG.warning(LOG_PREFIX + "You may experience some instability. Continuing anyway...");
+				break;
+			}
+			this.swConfig = upgraded;
+		}
 	}
 	
 	private void setupPermissions() {
@@ -145,4 +158,7 @@ public class ScratchWorlds extends JavaPlugin {
 		}
 	}
 
+	public Map<String, SWWorld> getWorlds() {
+		return this.worlds;
+	}
 }
