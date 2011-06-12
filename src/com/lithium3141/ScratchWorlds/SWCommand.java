@@ -20,7 +20,24 @@ public abstract class SWCommand {
 	 */
 	protected boolean checkArgLength(CommandSender sender, String[] args, int expected) {
 		if(args.length != expected) {
-			sender.sendMessage("Wrong number of arguments; expected " + expected + ", got " + args.length);
+			sender.sendMessage(ChatColor.RED + "Wrong number of arguments; expected " + expected + ", got " + args.length);
+			return false;
+		}
+		return true;
+	}
+	
+	/**
+	 * Check the length of the arguments array passed to an individual command.
+	 * 
+	 * @param sender The sender of the command
+	 * @param args The list of arguments sent
+	 * @param low The minimum number of arguments expected, inclusive
+	 * @param high The maximum number of arguments expected, inclusive
+	 * @return true if the argument list length falls between `low` and `high`; false otherwise
+	 */
+	protected boolean checkArgLength(CommandSender sender, String[] args, int low, int high) {
+		if(args.length < low || args.length > high) {
+			sender.sendMessage(ChatColor.RED + "Wrong number of arguments; expected between " + low + " and " + high + ", got " + args.length);
 			return false;
 		}
 		return true;

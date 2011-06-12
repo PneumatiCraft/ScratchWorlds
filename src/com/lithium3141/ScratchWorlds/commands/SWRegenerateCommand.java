@@ -2,6 +2,8 @@ package com.lithium3141.ScratchWorlds.commands;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -26,7 +28,19 @@ public class SWRegenerateCommand extends SWCommand {
 
 	@Override
 	public void execute(CommandSender sender, String[] args) {
-		if(!this.checkArgLength(sender, args, 0)) return;
+		if(!this.checkArgLength(sender, args, 0, 1)) return;
+		
+		List<String> toRegenerate = new ArrayList<String>();
+		if(args.length == 0) {
+			toRegenerate.addAll(this.plugin.scratchWorldNames);
+		} else {
+			if(this.plugin.scratchWorldNames.contains(args[0])) {
+				toRegenerate.add(args[0]);
+			} else {
+				sender.sendMessage(ChatColor.RED + "Argument '" + args[0] + "' is not a scratch world");
+				return;
+			}
+		}
 		
 		// Notify
 		ScratchWorlds.LOG.info(ScratchWorlds.LOG_PREFIX + "Regenerating scratch worlds...");
