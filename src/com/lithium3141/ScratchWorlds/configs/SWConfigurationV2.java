@@ -1,6 +1,7 @@
 package com.lithium3141.ScratchWorlds.configs;
 
 import java.io.File;
+import java.util.List;
 import java.util.Map.Entry;
 
 import org.bukkit.util.config.Configuration;
@@ -41,6 +42,11 @@ public class SWConfigurationV2 extends SWConfiguration {
 	public boolean readShouldReseed(String worldName) {
 		String path = SWConfiguration.createPath(WORLD_LIST_KEY, worldName, RESEED_KEY);
 		return this.configuration.getBoolean(path, true);
+	}
+
+	@Override
+	public List<String> readScratchWorldNames() {
+		return this.configuration.getKeys(WORLD_LIST_KEY);
 	}
 
 }

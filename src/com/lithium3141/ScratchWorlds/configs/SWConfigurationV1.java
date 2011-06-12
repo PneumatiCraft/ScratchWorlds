@@ -56,7 +56,7 @@ public class SWConfigurationV1 extends SWConfiguration {
 			return null;
 		} catch (ClassNotFoundException e) {
 			ScratchWorlds.LOG.fine(ScratchWorlds.LOG_PREFIX + "Config 1=>2 upgrade: Class not found exception");
-			e.printStackTrace();
+			return null;
 		}
 		
 		if(configFile == null) {
@@ -100,6 +100,11 @@ public class SWConfigurationV1 extends SWConfiguration {
 	public boolean readShouldReseed(String worldName) {
 		// All worlds under v1 config reseed on regenerate
 		return true;
+	}
+
+	@Override
+	public List<String> readScratchWorldNames() {
+		return this.configuration.getStringList(WORLD_LIST_KEY, new ArrayList<String>());
 	}
 
 }

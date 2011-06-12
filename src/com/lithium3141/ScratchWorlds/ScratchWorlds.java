@@ -66,7 +66,8 @@ public class ScratchWorlds extends JavaPlugin {
 		this.getDataFolder().mkdirs();
 		
 		// Read configuration file
-		this.swConfig = SWConfiguration.detectConfiguration(new File(this.getDataFolder(), SWConfiguration.CONFIG_FILE_NAME));
+		File configFile = new File(this.getDataFolder(), SWConfiguration.CONFIG_FILE_NAME);
+		this.swConfig = SWConfiguration.detectConfiguration(configFile);
 		while(this.swConfig.getVersion() != SWConfiguration.LATEST_CONFIG_VERSION) {
 			SWConfiguration upgraded = this.swConfig.upgrade();
 			if(upgraded == null) {
@@ -75,6 +76,10 @@ public class ScratchWorlds extends JavaPlugin {
 				break;
 			}
 			this.swConfig = upgraded;
+		}
+		
+		for(String scratchWorldName : this.swConfig.readScratchWorldNames()) {
+			this.addScratchWorld(this.getServer().getWorld(scratchWorldName));
 		}
 	}
 	

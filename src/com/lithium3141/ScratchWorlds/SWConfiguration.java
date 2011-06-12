@@ -1,6 +1,7 @@
 package com.lithium3141.ScratchWorlds;
 
 import java.io.File;
+import java.util.List;
 
 import org.bukkit.util.config.Configuration;
 
@@ -78,6 +79,7 @@ public abstract class SWConfiguration {
 	 */
 	public static SWConfiguration detectConfiguration(Configuration c) {
 		// If no version key, default to 1 (other configs have version key)
+		c.load();
 		int detectedVersion = c.getInt(VERSION_KEY, 1);
 		
 		// Instantiate concrete subclass as detected
@@ -125,6 +127,14 @@ public abstract class SWConfiguration {
 	 * @return Whether or not the world with the given name should reseed
 	 */
 	public abstract boolean readShouldReseed(String worldName);
+	
+	/**
+	 * Read from configuration file the list of worlds that are currently
+	 * marked as scratch.
+	 * 
+	 * @return A list of names for scratch worlds
+	 */
+	public abstract List<String> readScratchWorldNames();
 	
 	/**
 	 * Convert the given list of keys into a YAML-compatible key path,
