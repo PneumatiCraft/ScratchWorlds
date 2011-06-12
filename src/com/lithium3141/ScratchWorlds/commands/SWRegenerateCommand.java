@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -13,6 +14,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.lithium3141.ScratchWorlds.SWCommand;
+import com.lithium3141.ScratchWorlds.SWWorld;
 import com.lithium3141.ScratchWorlds.ScratchWorlds;
 
 /**
@@ -110,7 +112,12 @@ public class SWRegenerateCommand extends SWCommand {
 		}
 		
 		// Regenerate world
-		this.plugin.getServer().createWorld(worldName, env);
+		SWWorld scratchWorld = this.plugin.getScratchWorlds().get(worldName);
+		long seed = world.getSeed();
+		if(scratchWorld.getShouldReseed()) {
+			seed = (new Random()).nextLong();
+		}
+		this.plugin.getServer().createWorld(worldName, env, seed);
 		
 		return (this.plugin.getServer().getWorld(worldName) != null);
 	}
