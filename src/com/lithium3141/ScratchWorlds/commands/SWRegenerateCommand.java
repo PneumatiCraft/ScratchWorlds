@@ -32,9 +32,9 @@ public class SWRegenerateCommand extends SWCommand {
 		
 		List<String> toRegenerate = new ArrayList<String>();
 		if(args.length == 0) {
-			toRegenerate.addAll(this.plugin.scratchWorldNames);
+			toRegenerate.addAll(this.plugin.getScratchWorldNames());
 		} else {
-			if(this.plugin.scratchWorldNames.contains(args[0])) {
+			if(this.plugin.getScratchWorldNames().contains(args[0])) {
 				toRegenerate.add(args[0]);
 			} else {
 				sender.sendMessage(ChatColor.RED + "Argument '" + args[0] + "' is not a scratch world");
@@ -50,7 +50,7 @@ public class SWRegenerateCommand extends SWCommand {
 		
 		// Remove all players from each scratch world
 		for(Player player : this.plugin.getServer().getOnlinePlayers()) {
-			if(this.plugin.scratchWorldNames.contains(player.getWorld().getName())) {
+			if(this.plugin.getScratchWorldNames().contains(player.getWorld().getName())) {
 				ScratchWorlds.LOG.fine(ScratchWorlds.LOG_PREFIX + "Kicking player " + player.getName() + " from world " + player.getWorld().getName());
 				player.kickPlayer("Regenerating scratch world: " + player.getWorld().getName());
 			}
@@ -58,7 +58,7 @@ public class SWRegenerateCommand extends SWCommand {
 		
 		// Unload all chunks except spawn
 		for(World world : this.plugin.getServer().getWorlds()) {
-			if(this.plugin.scratchWorldNames.contains(world.getName())) {
+			if(this.plugin.getScratchWorldNames().contains(world.getName())) {
 				String worldName = world.getName();
 				
 				if(!this.unloadChunks(world, sender)) {

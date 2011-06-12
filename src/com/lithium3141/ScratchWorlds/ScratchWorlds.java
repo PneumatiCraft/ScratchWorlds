@@ -2,13 +2,13 @@ package com.lithium3141.ScratchWorlds;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -29,8 +29,7 @@ public class ScratchWorlds extends JavaPlugin {
 	
 	// Active config variables
 	public SWConfiguration swConfig;
-	public List<String> scratchWorldNames = new ArrayList<String>();
-	protected Map<String, SWWorld> worlds = new HashMap<String, SWWorld>();
+	protected Map<String, SWWorld> scratchWorlds = new HashMap<String, SWWorld>();
 	
 	// Permissions interface
 	public PermissionHandler permissionHandler;
@@ -158,7 +157,21 @@ public class ScratchWorlds extends JavaPlugin {
 		}
 	}
 
-	public Map<String, SWWorld> getWorlds() {
-		return this.worlds;
+	public Map<String, SWWorld> getScratchWorlds() {
+		return this.scratchWorlds;
+	}
+	
+	public Set<String> getScratchWorldNames() {
+		return this.scratchWorlds.keySet();
+	}
+
+	public void removeScratchWorld(World world) {
+		this.scratchWorlds.remove(world.getName());
+	}
+
+	public void addScratchWorld(World world) {
+		SWWorld scratchWorld = new SWWorld(world);
+		scratchWorld.setShouldReseed(this.swConfig.readShouldReseed(world.getName()));
+		this.scratchWorlds.put(world.getName(), scratchWorld);
 	}
 }

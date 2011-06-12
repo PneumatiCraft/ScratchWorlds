@@ -1,6 +1,7 @@
 package com.lithium3141.ScratchWorlds.commands;
 
 import org.bukkit.ChatColor;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
 import com.lithium3141.ScratchWorlds.SWCommand;
@@ -23,12 +24,13 @@ public class SWUnmarkCommand extends SWCommand {
 		if(!this.validateWorld(sender, worldName)) return;
 		
 		// Check that this world is currently marked
-		if(!this.plugin.scratchWorldNames.contains(worldName)) {
+		if(!this.plugin.getScratchWorldNames().contains(worldName)) {
 			sender.sendMessage(ChatColor.RED + "World " + worldName + " is not currently a scratch world!");
 			return;
 		}
 		
-		this.plugin.scratchWorldNames.remove(worldName);
+		World world = this.plugin.getServer().getWorld(worldName);
+		this.plugin.removeScratchWorld(world);
 		sender.sendMessage("World " + worldName + " is no longer a scratch world.");
 	}
 

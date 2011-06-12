@@ -116,4 +116,32 @@ public abstract class SWConfiguration {
 	 * @return true if the write succeeded; false otherwise
 	 */
 	public abstract boolean write(ScratchWorlds plugin);
+	
+	/**
+	 * Read from configuration file whether the world with the given name should
+	 * reseed on regeneration.
+	 * 
+	 * @param worldName The name of the world for which to read the reseed property
+	 * @return Whether or not the world with the given name should reseed
+	 */
+	public abstract boolean readShouldReseed(String worldName);
+	
+	/**
+	 * Convert the given list of keys into a YAML-compatible key path,
+	 * separated by dots. 
+	 * 
+	 * @param keys The list of keys to convert
+	 * @return A single key path for use in YAML queries
+	 */
+	public static String createPath(String... keys) {
+		if(keys.length == 0) {
+			return "";
+		}
+		
+		String result = keys[0];
+		for(int i = 1; i < keys.length; i++) {
+			result = result + "." + keys[i];
+		}
+		return result;
+	}
 }

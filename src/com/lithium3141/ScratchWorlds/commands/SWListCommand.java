@@ -27,7 +27,7 @@ public class SWListCommand extends SWCommand {
 		List<World> scratchWorlds = new ArrayList<World>();
 		List<World> otherWorlds = new ArrayList<World>();
 		for(World world : this.plugin.getServer().getWorlds()) {
-			if(this.plugin.scratchWorldNames.contains(world.getName())) {
+			if(this.plugin.getScratchWorldNames().contains(world.getName())) {
 				scratchWorlds.add(world);
 			} else {
 				otherWorlds.add(world);

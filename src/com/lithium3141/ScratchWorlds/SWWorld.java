@@ -40,7 +40,7 @@ public class SWWorld {
 	/**
 	 * @return Whether this world should reseed itself on regeneration
 	 */
-	public boolean shouldReseed() {
+	public boolean getShouldReseed() {
 		return shouldReseed;
 	}
 }
