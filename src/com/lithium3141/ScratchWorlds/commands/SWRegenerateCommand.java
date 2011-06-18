@@ -132,14 +132,20 @@ public class SWRegenerateCommand extends SWCommand {
 	}
 	
 	private boolean recursiveDelete(File file) {
-		if(file.isDirectory()) {
-			for(File f : file.listFiles()) {
-				this.recursiveDelete(f);
-			}
-		} else {
-			file.delete();
-		}
-		return true;
-	}
+        if (file.exists()) {
+            // If the file exists, and it has more than one file in it.
+            if (file.isDirectory()) {
+                for (File f : file.listFiles()) {
+                    if(!this.recursiveDelete(f)) {
+                    	return false;
+                    }
+                }
+            }
+            file.delete();
+            return !file.exists();
+        } else {
+            return false;
+        }
+    }
 
 }
