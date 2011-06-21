@@ -1,0 +1,30 @@
+<project default="jar">
+    <property name="src" location="src" />
+    <property name="build" location="bin" />
+    <property name="dist" location="." />
+
+    <path id="project.classpath">
+        <pathelement path="${classpath}" />
+        <pathelement path="craftbukkit-0.0.1-SNAPSHOT.jar" />
+        <pathelement path="Permissions.jar" />
+    </path>
+
+    <target name="init">
+        <tstamp />
+        <mkdir dir="${build}"/>
+    </target>
+    
+    <target name="compile" depends="init">
+        <javac srcdir="${src}" destdir="${build}" includeAntRuntime="false">
+            <classpath refid="project.classpath" />
+        </javac>
+    </target>
+
+    <target name="jar" depends="compile">
+        <jar jarfile="${dist}/ScratchWorlds.jar" basedir="${build}" includes="**/*.class plugin.yml">
+            <manifest>
+                <attribute name="Main-Class" value="ScratchWorlds" />
+            </manifest>
+        </jar>
+    </target>
+</project>
