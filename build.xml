@@ -12,7 +12,12 @@
 
     <target name="init">
         <tstamp />
-        <mkdir dir="${build}"/>
+
+        <mkdir dir="${build}" />
+        <mkdir dir="${lib}" />
+
+        <get src="http://ci.bukkit.org/job/dev-CraftBukkit/Recommended/artifact/target/craftbukkit-0.0.1-SNAPSHOT.jar" dest="${lib}" skipexisting="true" />
+        <get src="http://www.theyeticave.net/downloads/permissions/3.1.5/Permissions.jar" dest="${lib}" skipexisting="true" />
     </target>
     
     <target name="compile" depends="init">
@@ -32,5 +37,6 @@
 
     <target name="clean">
         <delete dir="${build}" />
+        <delete dir="${lib}" />
     </target>
 </project>
