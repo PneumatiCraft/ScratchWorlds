@@ -176,7 +176,9 @@ public class ScratchWorlds extends JavaPlugin {
 
 	public void addScratchWorld(World world) {
 		SWWorld scratchWorld = new SWWorld(world);
-		scratchWorld.setShouldReseed(this.swConfig.readShouldReseed(world.getName()));
+		String worldName = world.getName(); 
+		boolean shouldReseed = this.swConfig.readShouldReseed(worldName);
+		scratchWorld.setShouldReseed(shouldReseed);
 		this.scratchWorlds.put(world.getName(), scratchWorld);
 	}
 }
