@@ -12,6 +12,7 @@ import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.generator.ChunkGenerator;
 
 import com.lithium3141.ScratchWorlds.SWCommand;
 import com.lithium3141.ScratchWorlds.SWWorld;
@@ -83,6 +84,7 @@ public class SWRegenerateCommand extends SWCommand {
 	private boolean recreateWorld(World world, CommandSender sender) {
 		String worldName = world.getName();
 		Environment env = world.getEnvironment();
+		ChunkGenerator generator = world.getGenerator();
 		
 		for(Chunk c : world.getLoadedChunks()) {
 			world.unloadChunk(c.getX(), c.getZ());
@@ -117,7 +119,7 @@ public class SWRegenerateCommand extends SWCommand {
 		if(scratchWorld.getShouldReseed()) {
 			seed = (new Random()).nextLong();
 		}
-		this.plugin.getServer().createWorld(worldName, env, seed);
+		this.plugin.getServer().createWorld(worldName, env, seed, generator);
 		
 		return (this.plugin.getServer().getWorld(worldName) != null);
 	}

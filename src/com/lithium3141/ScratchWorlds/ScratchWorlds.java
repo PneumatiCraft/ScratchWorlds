@@ -175,10 +175,14 @@ public class ScratchWorlds extends JavaPlugin {
 	}
 
 	public void addScratchWorld(World world) {
-		SWWorld scratchWorld = new SWWorld(world);
-		String worldName = world.getName(); 
-		boolean shouldReseed = this.swConfig.readShouldReseed(worldName);
-		scratchWorld.setShouldReseed(shouldReseed);
-		this.scratchWorlds.put(world.getName(), scratchWorld);
+		if(world != null) {
+			SWWorld scratchWorld = new SWWorld(world);
+			String worldName = world.getName(); 
+			boolean shouldReseed = this.swConfig.readShouldReseed(worldName);
+			scratchWorld.setShouldReseed(shouldReseed);
+			this.scratchWorlds.put(worldName, scratchWorld);
+		} else {
+			LOG.warning(LOG_PREFIX + "Error loading world! Continuing...");
+		}
 	}
 }
